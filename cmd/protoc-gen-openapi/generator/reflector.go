@@ -158,6 +158,18 @@ func (r *OpenAPIv3Reflector) schemaOrReferenceForMessage(message protoreflect.Me
 	}
 }
 
+// Returns a ref for enum that reference the definition in `#/components/schemas/`
+func (r *OpenAPIv3Reflector) referenceForEnum(enum protoreflect.EnumDescriptor) *v3.SchemaOrReference {
+	refName := string(enum.Name())
+	return &v3.SchemaOrReference{
+		Oneof: &v3.SchemaOrReference_Reference{
+			Reference: &v3.Reference{
+				XRef: "#/components/schemas/" + refName,
+			},
+		},
+	}
+}
+
 func (r *OpenAPIv3Reflector) schemaOrReferenceForField(field protoreflect.FieldDescriptor) *v3.SchemaOrReference {
 	var kindSchema *v3.SchemaOrReference
 
@@ -195,7 +207,11 @@ func (r *OpenAPIv3Reflector) schemaOrReferenceForField(field protoreflect.FieldD
 		kindSchema = wk.NewIntegerSchema(kind.String())
 
 	case protoreflect.EnumKind:
-		kindSchema = wk.NewEnumSchema(*&r.conf.EnumType, field)
+		if *&r.conf.EnumType != nil && *r.conf.EnumType == "string" {
+			kindSchema = wk.NewEnumSchemaRef(field)
+		} else {
+			kindSchema = wk.NewEnumSchema(*&r.conf.EnumType, field)
+		}
 
 	case protoreflect.BoolKind:
 		kindSchema = wk.NewBooleanSchema()

@@ -786,6 +786,12 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 				continue
 			}
 
+			if *&g.reflect.conf.EnumType != nil && *g.reflect.conf.EnumType == "string" {
+				if field.Desc.Kind() == protoreflect.EnumKind {
+					g.addSchemaToDocumentV3(d, wk.EnumSchema(field.Desc))
+				}
+			}
+
 			if schema, ok := fieldSchema.Oneof.(*v3.SchemaOrReference_Schema); ok {
 				// Get the field description from the comments.
 				schema.Schema.Description = g.filterCommentString(field.Comments.Leading, true)

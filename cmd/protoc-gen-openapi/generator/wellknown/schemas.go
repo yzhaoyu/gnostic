@@ -68,6 +68,37 @@ func NewEnumSchema(enum_type *string, field protoreflect.FieldDescriptor) *v3.Sc
 			Schema: schema}}
 }
 
+func NewEnumSchemaRef(field protoreflect.FieldDescriptor) *v3.SchemaOrReference {
+	refName := string(field.Enum().Name())
+	return &v3.SchemaOrReference{
+		Oneof: &v3.SchemaOrReference_Reference{
+			Reference: &v3.Reference{
+				XRef: "#/components/schemas/" + refName,
+			},
+		},
+	}
+}
+
+func EnumSchema(field protoreflect.FieldDescriptor) *v3.NamedSchemaOrReference {
+	schema := &v3.Schema{Format: "enum"}
+	schema.Type = "string"
+	schema.Enum = make([]*v3.Any, 0, field.Enum().Values().Len())
+	for i := 0; i < field.Enum().Values().Len(); i++ {
+		schema.Enum = append(schema.Enum, &v3.Any{
+			Yaml: string(field.Enum().Values().Get(i).Name()),
+		})
+	}
+
+	return &v3.NamedSchemaOrReference{
+		Name: string(field.Enum().Name()),
+		Value: &v3.SchemaOrReference{
+			Oneof: &v3.SchemaOrReference_Schema{
+				Schema: schema,
+			},
+		},
+	}
+}
+
 func NewListSchema(item_schema *v3.SchemaOrReference) *v3.SchemaOrReference {
 	return &v3.SchemaOrReference{
 		Oneof: &v3.SchemaOrReference_Schema{

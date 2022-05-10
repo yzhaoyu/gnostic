@@ -788,7 +788,7 @@ func (g *OpenAPIv3Generator) addSchemasForMessagesToDocumentV3(d *v3.Document, m
 
 			if *&g.reflect.conf.EnumType != nil && *g.reflect.conf.EnumType == "string" {
 				if field.Desc.Kind() == protoreflect.EnumKind {
-					g.addSchemaToDocumentV3(d, wk.EnumSchema(field.Desc))
+					g.addSchemaToDocumentV3(d, wk.NamedEnumSchema(field.Desc))
 				}
 			}
 

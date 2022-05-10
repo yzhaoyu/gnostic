@@ -52,7 +52,7 @@ func NewNumberSchema(format string) *v3.SchemaOrReference {
 
 func NewEnumSchema(enum_type *string, field protoreflect.FieldDescriptor) *v3.SchemaOrReference {
 	schema := &v3.Schema{Format: "enum"}
-	if enum_type != nil && *enum_type == "string" {
+	if enum_type != nil && *enum_type == "string" { // 这里逻辑和调用函数的重复，需要修改
 		schema.Type = "string"
 		schema.Enum = make([]*v3.Any, 0, field.Enum().Values().Len())
 		for i := 0; i < field.Enum().Values().Len(); i++ {
@@ -79,7 +79,7 @@ func NewEnumSchemaRef(field protoreflect.FieldDescriptor) *v3.SchemaOrReference 
 	}
 }
 
-func EnumSchema(field protoreflect.FieldDescriptor) *v3.NamedSchemaOrReference {
+func NamedEnumSchema(field protoreflect.FieldDescriptor) *v3.NamedSchemaOrReference {
 	schema := &v3.Schema{Format: "enum"}
 	schema.Type = "string"
 	schema.Enum = make([]*v3.Any, 0, field.Enum().Values().Len())
